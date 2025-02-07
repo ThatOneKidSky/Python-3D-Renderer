@@ -8,10 +8,10 @@
 A simple 3D engine, written in Python, that uses OpenGL. On the user side there is, camera rotation... Amazing.
 
 # Features
-Camera System: Control the camera's orientation (pitch, yaw, roll).
-Skybox: A very bare bones skybox that is less of a skybox as apposed to as cube that just so happens to encapsulate the camera.
-OpenGL: Using OpenGL for rendering, because pygame just isnt fast enough for what I have planned.
-User Input: Mouse input for controlling camera rotation.
+- Camera System: Control the camera's orientation (pitch, yaw, roll).
+- Skybox: A very bare bones skybox that is less of a skybox as apposed to as cube that just so happens to encapsulate the camera.
+- OpenGL: Using OpenGL for rendering, because pygame just isnt fast enough for what I have planned.
+- User Input: Mouse input for controlling camera rotation.
 
 # Requirements:
 - Python (Im using 3.11.5)
