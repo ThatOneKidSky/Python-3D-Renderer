@@ -10,4 +10,3 @@ util/__pycache__/clamp.cpython-311.pyc
 util/__pycache__/lerp.cpython-311.pyc
 util/__pycache__/Quaternion.cpython-311.pyc
 util/__pycache__/Vec3.cpython-311.pyc
-.gitignore
