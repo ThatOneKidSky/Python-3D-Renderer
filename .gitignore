@@ -1,2 +1,5 @@
 system/__pycache__/*
 util/__pycache__/*
+__pycache__/DEBUG.cpython-311.pyc
+__pycache__/SETTINGS.cpython-311.pyc
+object/__pycache__/Cube.cpython-311.pyc

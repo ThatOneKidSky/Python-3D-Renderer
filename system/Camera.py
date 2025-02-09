@@ -1,11 +1,19 @@
 from util import Vec3, Quaternion
+import numpy as np, math, SETTINGS
 
 class Camera:
     """A bare bones Camera, it really is shrimple tho."""
-    def __init__(self, position:Vec3, rotation:Quaternion):
+    def __init__(self, position:Vec3, rotation:Quaternion, FOV:int = 45):
         self.position = position
         self.rotation = rotation
         self.calculateCameraVectors()
+        
+        self.FOV  = FOV
+        self.NEAR = 0.1
+        self.FAR  = 100.0
+
+        self.viewMatrix       = self.getViewMatrix()
+        self.projectionMatrix = self.getProjectionMatrix()
     
     #region Directions Vectors
     def calculateCameraVectors(self):
@@ -44,5 +52,35 @@ class Camera:
             rotationQuat = Quaternion.fromEuler(pitch, yaw, roll)
         
         self.rotation *= rotationQuat
+        self.calculateCameraVectors()
+
+        self.viewMatrix       = self.getViewMatrix()
+        self.projectionMatrix = self.getProjectionMatrix()
 
     #endregion
+
+    def getViewMatrix(self):
+        f = self.forward
+        r = self.right
+        u = self.up
+        p = self.position
+
+        return np.array([
+            [ r.x,  r.y,  r.z, -r.dot(p)],
+            [ u.x,  u.y,  u.z, -u.dot(p)],
+            [-f.x, -f.y, -f.z,  f.dot(p)],
+            [   0,    0,    0,         1],
+        ],dtype=np.float32)
+    
+    def getProjectionMatrix(self):
+        fovRad = math.radians(self.FOV)
+        f = 1 / math.tan(fovRad / 2)
+        fa = f / SETTINGS.SCREEN.ASPECT
+        fp1 = (self.NEAR + self.FAR) / (self.NEAR - self.FAR)
+        fp2 = (2 * self.FAR * self.NEAR) / (self.NEAR - self.FAR)
+        return np.array([
+            fa, 0,   0,   0,
+             0, f,   0,   0,
+             0, 0, fp1, fp2,
+             0, 0,  -1,   0,
+        ])

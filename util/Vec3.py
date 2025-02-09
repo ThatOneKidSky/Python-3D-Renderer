@@ -28,7 +28,7 @@ class Vec3:
     
     def __str__(self):
         # Im just stringing it together at this point
-        return f"({self.x}, {self.y}, {self.z})"
+        return f"({round(self.x,2)}, {round(self.y,2)}, {round(self.z,2)})"
     
     def __add__(self, other):
         # Direction plus direction, whats not to understand?
