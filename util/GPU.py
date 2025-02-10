@@ -57,25 +57,27 @@ class GPU:
     
     @staticmethod
     def loadShader(vertexPath, fragmentPath):
-        def openFile(path):
-            with open(path, 'r') as f:
-                return f.read()
-        
-        def compileShader(src, stype):
-            shader = glCreateShader(stype)
-            glShaderSource(shader, src)
-            glCompileShader(shader)
-            if glGetShaderiv(shader, GL_COMPILE_STATUS) != GL_TRUE:
-                raise RuntimeError(glGetShaderInfoLog(shader))
-            return shader
+        # Load function since both shader types use the same code
+        def load(path, stype):
+            try:
+                with open(f"shader/{path}.glsl", 'r') as f:
+                    shader = glCreateShader(stype)
+                    shaderSrc = f.read()
 
+                    glShaderSource(shader, shaderSrc)
+                    glCompileShader(shader)
+
+                    if glGetShaderiv(shader, GL_COMPILE_STATUS) != GL_TRUE:
+                        raise RuntimeError(glGetShaderInfoLog(shader))
+                    return shader
+            except FileNotFoundError:
+                raise FileNotFoundError(f"{path} not found")
+            except Exception as e:
+                raise e
 
         # Load Vertex and Frament files
-        vertexSrc   = openFile(vertexPath)
-        fragmentSrc = openFile(fragmentPath)
-
-        vertexShader   = compileShader(vertexSrc, GL_VERTEX_SHADER)
-        fragmentShader = compileShader(fragmentSrc, GL_FRAGMENT_SHADER)
+        vertexShader   = load(vertexPath, GL_VERTEX_SHADER)
+        fragmentShader = load(fragmentPath, GL_FRAGMENT_SHADER)
 
         shaderProgram = glCreateProgram()
         glAttachShader(shaderProgram, vertexShader)
@@ -91,7 +93,6 @@ class GPU:
         return shaderProgram
     
     def draw(VAO, tris):
-
         glBindVertexArray(VAO)
         glDrawElements(GL_TRIANGLES, tris, GL_UNSIGNED_INT, None)
         glBindVertexArray(0)

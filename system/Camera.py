@@ -10,10 +10,9 @@ class Camera:
         
         self.FOV  = FOV
         self.NEAR = 0.1
-        self.FAR  = 100.0
+        self.FAR  = 500.0
 
         self.viewMatrix       = self.getViewMatrix()
-        self.projectionMatrix = self.getProjectionMatrix()
     
     #region Directions Vectors
     def calculateCameraVectors(self):
@@ -45,17 +44,20 @@ class Camera:
         if isinstance(angle[0], Quaternion):
             rotationQuat = angle[0]
         else:
-            pitch = angle[0] if angle[0] is not None else 0
-            yaw   = angle[1] if angle[1] is not None else 0
-            roll  = angle[2] if angle[2] is not None else 0
+            p = angle[0] if angle[0] is not None else 0
+            y = angle[1] if angle[1] is not None else 0
+            r = angle[2] if angle[2] is not None else 0
             
-            rotationQuat = Quaternion.fromEuler(pitch, yaw, roll)
+            pQuat = Quaternion.fromEuler(p, 0, 0)
+            yQuat = Quaternion.fromEuler(0, y, 0)
+            rQuat = Quaternion.fromEuler(0, 0, r)
+
+            rotationQuat = pQuat * yQuat * rQuat
         
         self.rotation *= rotationQuat
         self.calculateCameraVectors()
 
         self.viewMatrix       = self.getViewMatrix()
-        self.projectionMatrix = self.getProjectionMatrix()
 
     #endregion
 
@@ -72,15 +74,3 @@ class Camera:
             [   0,    0,    0,         1],
         ],dtype=np.float32)
     
-    def getProjectionMatrix(self):
-        fovRad = math.radians(self.FOV)
-        f = 1 / math.tan(fovRad / 2)
-        fa = f / SETTINGS.SCREEN.ASPECT
-        fp1 = (self.NEAR + self.FAR) / (self.NEAR - self.FAR)
-        fp2 = (2 * self.FAR * self.NEAR) / (self.NEAR - self.FAR)
-        return np.array([
-            fa, 0,   0,   0,
-             0, f,   0,   0,
-             0, 0, fp1, fp2,
-             0, 0,  -1,   0,
-        ])

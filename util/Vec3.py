@@ -1,4 +1,4 @@
-import math
+import math, numpy as np
 from .clamp import clamp
 from .Angle import Angle
 
@@ -154,4 +154,5 @@ class Vec3:
             raise TypeError("MaxVal must be an int or float")
         raise TypeError("MinVal must be an int or float")
     
-
+    def toArray(self):
+        return np.array([self.x, self.y, self.z])

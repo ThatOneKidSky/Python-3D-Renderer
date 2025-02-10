@@ -1,35 +1,13 @@
-import numpy as np, pygame, math, SETTINGS
+import numpy as np, pygame, math, DEBUG, SETTINGS, random
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
+from objects import *
 from util import *
-from system.Camera import Camera
-from system.Chunk import *
+from system import *
 
 mouseLock = False
 mouseSensitivity = 0.005
-
-shader = None
-
-#region Init
-# I always need to say bruv
-def initGL():
-    global shader
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(50, SETTINGS.SCREEN.ASPECT, 0.1, 50.0)
-    glTranslatef(0.0, 0.0, 0.0)
-
-    glEnable(GL_DEPTH_TEST)
-    glDepthFunc(GL_LESS)
-
-
-    shader = GPU.loadShader("shader/vertex.glsl", "shader/fragment.glsl")
-
-def initPygame():
-    pygame.init()
-    pygame.display.set_mode((SETTINGS.SCREEN.WIDTH, SETTINGS.SCREEN.HEIGHT), pygame.DOUBLEBUF | pygame.OPENGL)
-#endregion
 
 def toggleCursorLock():
     """Toggles if the window will hide and lock the cursor"""
@@ -40,14 +18,21 @@ def toggleCursorLock():
     pygame.event.set_grab(mouseLock)
 
 def main():
-    initPygame()
-    initGL()
+    camera = Camera(Vec3(0, 60, 0), Quaternion())
+    window = Window(camera=camera,vertex='depthnormal/vertex',fragment='depthnormal/fragment')
 
-    camera = Camera(Vec3(), Quaternion())
-    chunk = Chunk()
-    chunk.generate()
-    chunk.mesh()
-    chunk.upload()
+    toRender = []
+    for x in range(50):
+        for y in range(50):
+            toRender.append(Cube(Vec3(x-5,random.randint(0,50),y-5), 
+                            Quaternion.fromEuler(0,0,0),
+                            Vec3(random.randint(1,10),random.randint(1,10),random.randint(1,10))
+                            ))
+    
+    glEnable(GL_CULL_FACE)
+    glCullFace(GL_BACK)
+
+    glEnable(GL_DEPTH_TEST)
 
     clock = pygame.time.Clock()
     running = True
@@ -64,50 +49,56 @@ def main():
                     toggleCursorLock()
 
         # Only allow cam rotation if in screen
+        CAMERA_SPEED = 0.5
         if mouseLock:
             mouseDx, mouseDy = pygame.mouse.get_rel()
+            camera.rotate(-mouseDy*mouseSensitivity, -mouseDx*mouseSensitivity, 0)
+            keys = pygame.key.get_pressed()  # Get the state of all keys
+            if keys[pygame.K_w]:
+                camera.position += camera.forward * CAMERA_SPEED  # Move forward
+            if keys[pygame.K_s]:
+                camera.position -= camera.forward * CAMERA_SPEED  # Move backward
+            if keys[pygame.K_a]:
+                camera.position -= camera.right * CAMERA_SPEED  # Move left
+            if keys[pygame.K_d]:
+                camera.position += camera.right * CAMERA_SPEED  # Move right
+            if keys[pygame.K_SPACE]:
+                camera.position += camera.up * CAMERA_SPEED  # Move left
+            if keys[pygame.K_LSHIFT]:
+                camera.position -= camera.up * CAMERA_SPEED  # Move right
+            if keys[pygame.K_e]:
+                camera.rotate(Quaternion.fromEuler(0, 0, -0.01))
+            if keys[pygame.K_q]:
+                camera.rotate(Quaternion.fromEuler(0, 0, 0.01))
 
-            # Pitch -> Yaw -> Roll
-            #camera.rotate(-mouseDy*mouseSensitivity, -mouseDx*mouseSensitivity, 0)
-        camera.rotate(0, 0, 0.01)
-        
-        # Clear screen/buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glUseProgram(window.shader)
         
-        # Set active shader
-        glUseProgram(shader)
+        # These stay the same between frames
+        vMatrix = camera.viewMatrix
+        pMatrix = window.projectionMatrix
+        
+        glUniformMatrix4fv(glGetUniformLocation(window.shader, "view"),       1, GL_TRUE, vMatrix)
+        glUniformMatrix4fv(glGetUniformLocation(window.shader, "projection"), 1, GL_TRUE, pMatrix)
 
-        # Get "in"s for shader
-        viewLoc  = glGetUniformLocation(shader, "view")
-        projLoc  = glGetUniformLocation(shader, "proj")
-        modelLoc = glGetUniformLocation(shader, "model")
+        # Then render each object
+        for model in toRender:
+            try:
+                mMatrix = model.getModelMatrix()
 
-        # Matrices
-        vm = camera.viewMatrix
-        pm = camera.projectionMatrix
-        mm = np.eye(4, dtype=np.float32)
+                glUniformMatrix4fv(glGetUniformLocation(window.shader, "model"), 1, GL_TRUE, mMatrix)
 
-        # Pass in to shaders
-        glUniformMatrix4fv(viewLoc,  1, GL_TRUE, vm)
-        glUniformMatrix4fv(projLoc,  1, GL_TRUE, pm)
-        glUniformMatrix4fv(modelLoc, 1, GL_TRUE, mm)
+                model.render()
+            except Exception as e:
+                print(e)
 
-        glViewport(0, 0, SETTINGS.SCREEN.WIDTH, SETTINGS.SCREEN.HEIGHT)
-
-        # Render
-        chunk.render()
-
-        # Reset for next frame
-        glUseProgram(0)
-
-        if DEBUG.CAMERA.DIRECTION:
-            print(camera.up)
+        #print(window.activeCamera.up)
 
         pygame.display.flip()
-        clock.tick(250)
+        clock.tick(60)
+        fps = clock.get_fps()
+        pygame.display.set_caption(str(fps))
     pygame.quit()
-
-
 
 if __name__ == "__main__":
     main()

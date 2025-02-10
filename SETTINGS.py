@@ -1,4 +1,3 @@
 class SCREEN:
-    WIDTH = 600
-    HEIGHT = 600
-    ASPECT = WIDTH / HEIGHT
+    WIDTH = 1600
+    HEIGHT = 1000

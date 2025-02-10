@@ -1,29 +1,6 @@
 import math
 from .Angle import Angle
 from .clamp import clamp
-from .Vec3 import Vec3
-
-def matrix(A, B):
-    if isinstance(A, Vec3):
-        A = [[A.x, A.y, A.z]]
-        
-    if isinstance(B, Vec3):
-        B = [
-            [B.x, 0,   0  ],
-            [0,   B.y, 0  ],
-            [0,   0,   B.z]
-        ]
-
-    if len(A[0]) != len(B):
-        raise ValueError("Matrices have incompatible dimentions.")
-    
-    result = [[0] * len(B[0]) for _ in range(len(A))]
-
-    for i in range(len(A)):
-        for j in range(len(B[0])):
-            result[i][j] = sum(A[i][k] * B[k][j] for k in range(len(B)))
-    
-    return result
 
 class Vec2:
     """
