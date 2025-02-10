@@ -5,30 +5,34 @@
 </div>
 <br>
 
-A simple 3D engine, written in Python, that uses OpenGL. On the user side there is, camera rotation... Amazing.
 
-# Features
-- Camera System: Control the camera's orientation (pitch, yaw, roll).
-- Skybox: A very bare bones skybox that is less of a skybox as apposed to as cube that just so happens to encapsulate the camera.
-- OpenGL: Using OpenGL for rendering, because pygame just isnt fast enough for what I have planned.
-- User Input: Mouse input for controlling camera rotation.
 
-# Requirements:
-- Python (Im using 3.11.5)
-- PyOpenGL
-- pygame
-- NumPy
+<h1 align="center">Features</h1>
+<ul>
+  <li>Camera System: Fly the camera with WASD, turn with mouse movement and roll with Q and E</li>
+  <li>Cubes: A great way to drop frames. Default rendering 50x50 cube of cubes with random y coords... and scales!</li>
+  <li>OpenGL: Using OpenGL for rendering, because pygame just isnt fast enough for what I have planned.</li>
+</ul>
+
+<h1 align="center">Requirements</h1>
+<ul>
+  <li>Python (Im using 3.11.5)</li>
+  <li>PyOpenGL</li>
+  <li>pygame</li>
+  <li>NumPy</li>
+</ul>
 
 Everything else is built in house (or stolen from my other projects, sucks to be past me)
 
-# Controls
-_Mouse_: Move the mouse to rotate the camera.
-Escape: Exit the application.
+<h1 align="center">Controls</h1>
 
-# Camera
-The camera is basic for now, no projection or other such fun stuff. The camera has pitch and yaw, both relative to itself (ie: up is not always y+). No controls yet for roll, but Ive got plans!
+<strong>Mouse</strong>: Move the mouse to rotate the camera.
 
-# Roadmap
-- Add camera movement
-- Add objects in the world
-- Add the ability to load images and display them on faces
+<strong>Escape</strong>: Exit the application.
+
+<strong>Left Click</strong>: Toggle "mouse lock". (allows the use of the mouse for looking)
+
+<strong>WASD</strong>: Moves you about... or does it move the world? 
+
+#
+<h3>We really gettin funky now!</h3>
